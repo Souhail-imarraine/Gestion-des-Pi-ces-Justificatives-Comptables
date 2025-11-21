@@ -1,11 +1,12 @@
 package com.alamanedocs.entity;
 
-import com.alamanedocs.enums.TypeDocument;
-import com.alamanedocs.enums.StatutDocument;
+import com.alamanedocs.enums.DocumentStatus;
+import com.alamanedocs.enums.DocumentType;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -16,6 +17,7 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Document {
     
     @Id
@@ -27,7 +29,7 @@ public class Document {
     
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private TypeDocument type;
+    private DocumentType type;
     
     private String categorieComptable;
     
@@ -35,26 +37,42 @@ public class Document {
     private LocalDate datePiece;
     
     private BigDecimal montant;
+    
     private String fournisseur;
     
     @Column(nullable = false)
-    private String cheminFichier;
+    private String fichierPath;
     
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private StatutDocument statut = StatutDocument.EN_ATTENTE;
+    private DocumentStatus statut = DocumentStatus.EN_ATTENTE;
     
     private LocalDateTime dateValidation;
+    
     private String commentaireComptable;
+    
+    private String motifRejet;
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "societe_id", nullable = false)
     private Societe societe;
     
-    @Column(nullable = false)
-    private LocalDateTime dateCreation = LocalDateTime.now();
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "created_by")
+    private User createdBy;
     
-    private LocalDateTime dateModification;
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
     
-
+    private LocalDateTime updatedAt;
+    
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+    }
+    
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 }

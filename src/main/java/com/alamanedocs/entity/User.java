@@ -1,10 +1,11 @@
 package com.alamanedocs.entity;
 
-import com.alamanedocs.enums.Role;
+import com.alamanedocs.enums.RoleType;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,11 +15,12 @@ import java.util.Collection;
 import java.util.List;
 
 @Entity
-@Table(name = "utilisateurs")
+@Table(name = "users")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Utilisateur implements UserDetails {
+@Builder
+public class User implements UserDetails {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,14 +30,14 @@ public class Utilisateur implements UserDetails {
     private String email;
     
     @Column(nullable = false)
-    private String motDePasse;
+    private String password;
     
     @Column(nullable = false)
     private String nomComplet;
     
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Role role;
+    private RoleType role;
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "societe_id")
@@ -44,19 +46,17 @@ public class Utilisateur implements UserDetails {
     @Column(nullable = false)
     private Boolean actif = true;
     
-    @Column(nullable = false)
-    private LocalDateTime dateCreation = LocalDateTime.now();
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
     
-
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
-    }
-
-    @Override
-    public String getPassword() {
-        return motDePasse;
     }
 
     @Override

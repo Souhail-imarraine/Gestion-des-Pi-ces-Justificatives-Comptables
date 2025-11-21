@@ -1,16 +1,20 @@
 package com.alamanedocs.dto;
 
-import lombok.Data;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class LoginRequest {
     
-    @NotBlank
-    @Email
+    @NotBlank(message = "L'email est obligatoire")
+    @Email(message = "Format d'email invalide")
     private String email;
     
-    @NotBlank
-    private String motDePasse;
+    @NotBlank(message = "Le mot de passe est obligatoire")
+    private String password;
 }

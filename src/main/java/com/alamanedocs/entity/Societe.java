@@ -1,18 +1,19 @@
 package com.alamanedocs.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Table(name = "societes")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Societe {
     
     @Id
@@ -22,19 +23,20 @@ public class Societe {
     @Column(nullable = false)
     private String raisonSociale;
     
-    @Column(unique = true, nullable = false)
+    @Column(unique = true, nullable = false, length = 15)
     private String ice;
     
     private String adresse;
+    
     private String telephone;
+    
     private String emailContact;
     
-    @Column(nullable = false)
-    private LocalDateTime dateCreation = LocalDateTime.now();
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
     
-    @OneToMany(mappedBy = "societe", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Utilisateur> utilisateurs;
-    
-    @OneToMany(mappedBy = "societe", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Document> documents;
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+    }
 }
